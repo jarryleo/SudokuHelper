@@ -79,6 +79,7 @@ public class SudokuCell extends View {
 
     public void setMode(@Mode int mode) {
         mCurrentMode = mode;
+        invalidate();
     }
 
     @Override
@@ -107,18 +108,15 @@ public class SudokuCell extends View {
                     canvas.drawText(String.valueOf(i), x, y - (h - rect.height()) / 2, mTextPaint);
                 }
             }
-            setBackgroundColor(Color.WHITE);
+            //显示焦点
+            if ((mCurrentMode & MODE_FOCUS) == MODE_FOCUS) {
+                setBackgroundColor(Color.GREEN);
+            } else {
+                setBackgroundColor(Color.WHITE);
+            }
             return;
         }
-        if (mShowNum == 0) {
-            setBackgroundColor(Color.WHITE);
-            return;
-        }
-        mTextPaint.setTextSize(h);
-        mTextPaint.setColor(Color.BLACK);
-        Rect rect = new Rect();
-        mTextPaint.getTextBounds(s, 0, 1, rect);
-        canvas.drawText(s, w / 2, h - (h - rect.height()) / 2, mTextPaint);
+
         //显示题目数字
         if ((mCurrentMode & MODE_TITLE) == MODE_TITLE) {
             setBackgroundColor(Color.LTGRAY);
@@ -135,5 +133,14 @@ public class SudokuCell extends View {
         if ((mCurrentMode & MODE_FOCUS) == MODE_FOCUS) {
             setBackgroundColor(Color.GREEN);
         }
+        if (mShowNum == 0) {
+            //setBackgroundColor(Color.WHITE);
+            return;
+        }
+        mTextPaint.setTextSize(h);
+        mTextPaint.setColor(Color.BLACK);
+        Rect rect = new Rect();
+        mTextPaint.getTextBounds(s, 0, 1, rect);
+        canvas.drawText(s, w / 2, h - (h - rect.height()) / 2, mTextPaint);
     }
 }

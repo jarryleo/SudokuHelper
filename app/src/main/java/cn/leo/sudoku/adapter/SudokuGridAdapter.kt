@@ -7,11 +7,14 @@ import cn.leo.sudoku.core.SudokuChecker
 import cn.leo.sudoku.holder.SudokuCellHolder
 import cn.leo.sudoku.view.SudokuCell
 
-class SudokuGridAdapter() : RecyclerView.Adapter<SudokuCellHolder>() {
+class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
     var mList: ArrayList<SudokuCellBean> = ArrayList()
     var mTitle: Array<ByteArray>? = null
+    var mSelectPostion = -1
+    var mLastSelectPostion = -1
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SudokuCellHolder {
-        return SudokuCellHolder(SudokuCell(parent.context))
+        return SudokuCellHolder(SudokuCell(parent.context), this)
     }
 
     override fun getItemCount(): Int {
@@ -19,13 +22,27 @@ class SudokuGridAdapter() : RecyclerView.Adapter<SudokuCellHolder>() {
     }
 
     override fun onBindViewHolder(holder: SudokuCellHolder, position: Int) {
-        if (mList.size != 81) return
+        if (mList.size != 81) initList()
         val bean = mList[position]
         holder.setData(bean)
     }
 
+    fun setSelectPosition(position: Int) {
+        if (mList[position].mode and SudokuCell.MODE_TITLE == SudokuCell.MODE_TITLE) return
+        mLastSelectPostion = mSelectPostion
+        mSelectPostion = position
+        notifyItemChanged(mSelectPostion)
+        notifyItemChanged(mLastSelectPostion)
+    }
+
+    fun getSelectPosition() = mSelectPostion
+
+    /**
+     * 显示题目
+     */
     fun setTitle(title: Array<ByteArray>) {
         mTitle = title
+        mList.clear()
         title.forEachIndexed { i, bytes ->
             bytes.forEachIndexed { j, byte ->
                 val element = SudokuCellBean(byte.toInt())
@@ -35,6 +52,9 @@ class SudokuGridAdapter() : RecyclerView.Adapter<SudokuCellHolder>() {
         }
     }
 
+    /**
+     * 显示候选数
+     */
     fun showFlag() {
         if (mTitle == null) return
         mTitle!!.forEachIndexed { i, bytes ->
@@ -47,4 +67,21 @@ class SudokuGridAdapter() : RecyclerView.Adapter<SudokuCellHolder>() {
             }
         }
     }
+
+    fun inputNum(num: Int) {
+        if (mSelectPostion < 0) return
+        if (mList.size == 0) initList()
+        mList[mSelectPostion].num = num
+        mList[mSelectPostion].mode = SudokuCell.MODE_INPUT
+        notifyItemChanged(mSelectPostion)
+    }
+
+    private fun initList() {
+        for (i in 0..81) {
+            val element = SudokuCellBean(0)
+            element.mode = SudokuCell.MODE_INPUT
+            mList.add(element)
+        }
+    }
+
 }
