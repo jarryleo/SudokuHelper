@@ -64,7 +64,7 @@
         android:text="5"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintLeft_toRightOf="@+id/btnNum4"
-        app:layout_constraintRight_toLeftOf="@id/btnNum6"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rvSudokuGrid"/>
 
     <TextView
@@ -73,9 +73,9 @@
         android:layout_width="0dp"
         android:text="6"
         app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintLeft_toRightOf="@+id/btnNum5"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/btnNum7"
-        app:layout_constraintTop_toBottomOf="@id/rvSudokuGrid"/>
+        app:layout_constraintTop_toBottomOf="@id/btnNum1"/>
 
     <TextView
         android:id="@+id/btnNum7"
@@ -85,7 +85,7 @@
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintLeft_toRightOf="@+id/btnNum6"
         app:layout_constraintRight_toLeftOf="@id/btnNum8"
-        app:layout_constraintTop_toBottomOf="@id/rvSudokuGrid"/>
+        app:layout_constraintTop_toBottomOf="@id/btnNum1"/>
 
     <TextView
         android:id="@+id/btnNum8"
@@ -95,7 +95,7 @@
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintLeft_toRightOf="@+id/btnNum7"
         app:layout_constraintRight_toLeftOf="@id/btnNum9"
-        app:layout_constraintTop_toBottomOf="@id/rvSudokuGrid"/>
+        app:layout_constraintTop_toBottomOf="@id/btnNum1"/>
 
     <TextView
         android:id="@+id/btnNum9"
@@ -104,6 +104,36 @@
         android:text="9"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintLeft_toRightOf="@+id/btnNum8"
+        app:layout_constraintRight_toLeftOf="@+id/btnNum0"
+        app:layout_constraintTop_toBottomOf="@id/btnNum1"/>
+
+    <TextView
+        android:id="@+id/btnNum0"
+        style="@style/number_button_style"
+        android:layout_width="0dp"
+        android:text="清除"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toRightOf="@+id/btnNum9"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rvSudokuGrid"/>
+        app:layout_constraintTop_toBottomOf="@id/btnNum1"/>
+
+    <TextView
+        android:id="@+id/btnAllClear"
+        style="@style/number_button_style"
+        android:layout_width="0dp"
+        android:text="全部清空"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/btnSolve"/>
+
+    <TextView
+        android:id="@+id/btnSolve"
+        style="@style/number_button_style"
+        android:layout_width="0dp"
+        android:text="电脑解题"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toRightOf="@id/btnAllClear"
+        app:layout_constraintRight_toRightOf="parent"/>
 </android.support.constraint.ConstraintLayout>

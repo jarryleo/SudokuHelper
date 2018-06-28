@@ -8,10 +8,10 @@ import cn.leo.sudoku.holder.SudokuCellHolder
 import cn.leo.sudoku.view.SudokuCell
 
 class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
-    var mList: ArrayList<SudokuCellBean> = ArrayList()
-    var mTitle: Array<ByteArray>? = null
-    var mSelectPostion = -1
-    var mLastSelectPostion = -1
+    private var mList: ArrayList<SudokuCellBean> = ArrayList()
+    private var mTitle: Array<ByteArray>? = null
+    private var mSelectPosition = -1
+    private var mLastSelectPosition = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SudokuCellHolder {
         return SudokuCellHolder(SudokuCell(parent.context), this)
@@ -29,27 +29,27 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
 
     fun setSelectPosition(position: Int) {
         if (mList[position].mode and SudokuCell.MODE_TITLE == SudokuCell.MODE_TITLE) return
-        mLastSelectPostion = mSelectPostion
-        mSelectPostion = position
-        notifyItemChanged(mSelectPostion)
-        notifyItemChanged(mLastSelectPostion)
+        mLastSelectPosition = mSelectPosition
+        mSelectPosition = position
+        notifyItemChanged(mSelectPosition)
+        notifyItemChanged(mLastSelectPosition)
     }
 
-    fun getSelectPosition() = mSelectPostion
+    fun getSelectPosition() = mSelectPosition
 
     /**
      * 显示题目
      */
     fun setTitle(title: Array<ByteArray>) {
         mTitle = title
-        mList.clear()
         title.forEachIndexed { i, bytes ->
             bytes.forEachIndexed { j, byte ->
-                val element = SudokuCellBean(byte.toInt())
-                element.mode = if (byte > 0) SudokuCell.MODE_TITLE else SudokuCell.MODE_INPUT
-                mList.add(i * 9 + j, element)
+                val bean = mList[i * 9 + j]
+                bean.num = byte.toInt()
+                bean.mode = if (byte > 0) SudokuCell.MODE_TITLE else SudokuCell.MODE_INPUT
             }
         }
+        notifyDataSetChanged()
     }
 
     /**
@@ -68,20 +68,76 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
         }
     }
 
+    /**
+     * 输入数字
+     */
     fun inputNum(num: Int) {
-        if (mSelectPostion < 0) return
+        if (mSelectPosition < 0) return
         if (mList.size == 0) initList()
-        mList[mSelectPostion].num = num
-        mList[mSelectPostion].mode = SudokuCell.MODE_INPUT
-        notifyItemChanged(mSelectPostion)
+        mList[mSelectPosition].num = num
+        mList[mSelectPosition].mode = SudokuCell.MODE_INPUT
+        notifyItemChanged(mSelectPosition)
     }
 
+    /**
+     * 初始化集合
+     */
     private fun initList() {
-        for (i in 0..81) {
+        for (i in 0..80) {
             val element = SudokuCellBean(0)
             element.mode = SudokuCell.MODE_INPUT
             mList.add(element)
         }
+    }
+
+    /**
+     * 自动解题,输入变题目
+     */
+    fun autoSolve() {
+        val title: Array<ByteArray> = Array(9) { ByteArray(9) }
+        for (i in 0..8) {
+            for (j in 0..8) {
+                val cell = mList[i * 9 + j]
+                title[i][j] = cell.num.toByte()
+                if (cell.num > 0) {
+                    cell.mode = SudokuCell.MODE_TITLE
+                    notifyItemChanged(i * 9 + j)
+                }
+            }
+        }
+        mSelectPosition = -1
+        mTitle = title
+    }
+
+    fun getTitle() = mTitle
+
+    /**
+     * 显示答案
+     */
+    fun showAnswer(title: Array<ByteArray>) {
+        title.forEachIndexed { i, bytes ->
+            bytes.forEachIndexed { j, byte ->
+                val bean = mList[i * 9 + j]
+                if (bean.num == 0) {
+                    bean.num = byte.toInt()
+                    bean.mode = SudokuCell.MODE_INPUT
+                    notifyItemChanged(i * 9 + j)
+                }
+            }
+        }
+    }
+
+    /**
+     * 全部清除
+     */
+    fun allClear() {
+        for (i in 0..80) {
+            val bean = mList[i]
+            bean.mode = SudokuCell.MODE_INPUT
+            bean.num = 0
+        }
+        mSelectPosition = -1
+        notifyDataSetChanged()
     }
 
 }
