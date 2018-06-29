@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
     //电脑解题
     private fun computerSolve() {
 
-        dialog?.show()
+
         val title = sudokuGridAdapter.getInputMap()
         val check = SudokuChecker.check(title)
         if (!check) {
@@ -116,6 +116,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT).show()
             return
         }
+        dialog?.show()
         if (sudokuGridAdapter.getTitle() == null)
             sudokuGridAdapter.tobeTitle()
         Thread {

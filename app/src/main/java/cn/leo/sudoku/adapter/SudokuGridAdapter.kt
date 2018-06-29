@@ -140,10 +140,14 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
      * 清空错误提示
      */
     private fun clearError() {
+        val inputMap = getInputMap()
         mList.forEachIndexed { index, cell ->
             if (cell.mode and SudokuCell.MODE_ERROR == SudokuCell.MODE_ERROR) {
-                cell.mode = cell.mode xor SudokuCell.MODE_ERROR
-                notifyItemChanged(index)
+                val check = SudokuChecker.checkCell(inputMap, index / 9, index % 9, cell.num)
+                if (check) {
+                    cell.mode = cell.mode xor SudokuCell.MODE_ERROR
+                    notifyItemChanged(index)
+                }
             }
         }
     }

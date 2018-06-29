@@ -9,10 +9,6 @@
         app:actionLayout="@layout/switch_item"
         app:showAsAction="always"/>
     <item
-        android:id="@+id/item_input"
-        android:title="转成题目">
-    </item>
-    <item
         android:id="@+id/item_titile"
         android:title="电脑出题">
         <menu
@@ -37,6 +33,10 @@
     <item
         android:id="@+id/item_solve"
         android:title="电脑解题"/>
+    <item
+        android:id="@+id/item_input"
+        android:title="转成题目">
+    </item>
     <item
         android:id="@+id/item_reload"
         android:title="重做此题"/>
