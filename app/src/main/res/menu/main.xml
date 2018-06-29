@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/item_switch"
+        android:title="显示候选词"
+        app:actionLayout="@layout/switch_item"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/item_input"
+        android:title="输入题目">
+    </item>
+    <item
+        android:id="@+id/item_titile"
+        android:title="电脑出题">
+        <menu
+            >
+            <item
+                android:id="@+id/item_level0"
+                android:title="入门级"/>
+            <item
+                android:id="@+id/item_level1"
+                android:title="初级"/>
+            <item
+                android:id="@+id/item_level2"
+                android:title="中级"/>
+            <item
+                android:id="@+id/item_level3"
+                android:title="高级"/>
+            <item
+                android:id="@+id/item_level4"
+                android:title="骨灰级"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/item_solve"
+        android:title="电脑解题"/>
+    <item
+        android:id="@+id/item_reload"
+        android:title="重做此题"/>
+    <item
+        android:id="@+id/item_clear"
+        android:title="全部清空"/>
+</menu>

@@ -12,6 +12,7 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
     private var mTitle: Array<ByteArray>? = null
     private var mSelectPosition = -1
     private var mLastSelectPosition = -1
+    private var mShowFlag = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SudokuCellHolder {
         return SudokuCellHolder(SudokuCell(parent.context), this)
@@ -20,6 +21,10 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
     override fun getItemCount(): Int {
         return 81
     }
+
+    fun getSelectPosition() = mSelectPosition
+
+    fun getTitle() = mTitle
 
     override fun onBindViewHolder(holder: SudokuCellHolder, position: Int) {
         if (mList.size != 81) initList()
@@ -35,13 +40,31 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
         notifyItemChanged(mLastSelectPosition)
     }
 
-    fun getSelectPosition() = mSelectPosition
+    /**
+     * 候选数开关
+     */
+    fun setShowFlag(show: Boolean) {
+        if (show == mShowFlag) return
+        mShowFlag = show
+        if (mShowFlag) {
+            showFlag()
+        } else {
+            hideFlag()
+        }
+    }
 
     /**
      * 显示题目
      */
     fun setTitle(title: Array<ByteArray>) {
         mTitle = title
+        load(title)
+    }
+
+    /**
+     * 装载题目
+     */
+    private fun load(title: Array<ByteArray>) {
         title.forEachIndexed { i, bytes ->
             bytes.forEachIndexed { j, byte ->
                 val bean = mList[i * 9 + j]
@@ -50,20 +73,48 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
             }
         }
         notifyDataSetChanged()
+        if (mShowFlag) showFlag()
     }
+
+    /**
+     *重做
+     */
+    fun reload() {
+        load(mTitle!!)
+    }
+
 
     /**
      * 显示候选数
      */
-    fun showFlag() {
-        if (mTitle == null) return
-        mTitle!!.forEachIndexed { i, bytes ->
+    private fun showFlag() {
+        val title: Array<ByteArray> = Array(9) { ByteArray(9) }
+        for (i in 0..8) {
+            for (j in 0..8) {
+                val cell = mList[i * 9 + j]
+                title[i][j] = cell.num.toByte()
+            }
+        }
+        title.forEachIndexed { i, bytes ->
             bytes.forEachIndexed { j, byte ->
                 if (byte.toInt() == 0) {
                     val cell = mList[i * 9 + j]
                     cell.mode = SudokuCell.MODE_FLAG
                     cell.flag = SudokuChecker.findCellCanInputNum(mTitle, i, j) as ArrayList<Int>
+                    notifyItemChanged(i * 9 + j)
                 }
+            }
+        }
+    }
+
+    /**
+     * 隐藏候选数
+     */
+    private fun hideFlag() {
+        mList.forEachIndexed { index, sudokuCellBean ->
+            if ((sudokuCellBean.mode and SudokuCell.MODE_FLAG) == SudokuCell.MODE_FLAG) {
+                sudokuCellBean.mode = SudokuCell.MODE_INPUT
+                notifyItemChanged(index)
             }
         }
     }
@@ -77,6 +128,7 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
         mList[mSelectPosition].num = num
         mList[mSelectPosition].mode = SudokuCell.MODE_INPUT
         notifyItemChanged(mSelectPosition)
+        if (mShowFlag) showFlag()
     }
 
     /**
@@ -109,7 +161,6 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
         mTitle = title
     }
 
-    fun getTitle() = mTitle
 
     /**
      * 显示答案

@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
@@ -64,7 +65,7 @@ public class SudokuCell extends View {
 
     public void setNum(int showNum) {
         mShowNum = showNum;
-        invalidate();
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     public List<Integer> getFlag() {
@@ -74,12 +75,12 @@ public class SudokuCell extends View {
     public void setFlag(List<Integer> flag) {
         mFlag.clear();
         mFlag.addAll(flag);
-        invalidate();
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     public void setMode(@Mode int mode) {
         mCurrentMode = mode;
-        invalidate();
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     @Override

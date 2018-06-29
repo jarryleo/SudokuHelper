@@ -13,13 +13,17 @@ public class GridLine extends RecyclerView.ItemDecoration {
         int i = layoutManager.getPosition(view);
         x = i % 9;
         y = i / 9;
-        if (x % 3 == 0) l = 2;
+        if (x == 0) l = 4;
+        else if (x % 3 == 0) l = 2;
         else l = 1;
-        if (x % 3 == 2) r = 2;
+        if (x == 8) r = 4;
+        else if (x % 3 == 2) r = 2;
         else r = 1;
-        if (y % 3 == 0) t = 2;
+        if (y == 0) t = 4;
+        else if (y % 3 == 0) t = 2;
         else t = 1;
-        if (y % 3 == 2) b = 2;
+        if (y == 8) b = 4;
+        else if (y % 3 == 2) b = 2;
         else b = 1;
         outRect.set(l, t, r, b);
     }
