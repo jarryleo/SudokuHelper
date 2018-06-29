@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/item_switch"
@@ -9,7 +10,7 @@
         app:showAsAction="always"/>
     <item
         android:id="@+id/item_input"
-        android:title="输入题目">
+        android:title="转成题目">
     </item>
     <item
         android:id="@+id/item_titile"

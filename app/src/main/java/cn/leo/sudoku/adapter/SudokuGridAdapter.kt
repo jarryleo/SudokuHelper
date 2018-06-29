@@ -64,7 +64,8 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
     /**
      * 装载题目
      */
-    private fun load(title: Array<ByteArray>) {
+    private fun load(title: Array<ByteArray>?) {
+        if (title == null) return
         title.forEachIndexed { i, bytes ->
             bytes.forEachIndexed { j, byte ->
                 val bean = mList[i * 9 + j]
@@ -80,7 +81,7 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
      *重做
      */
     fun reload() {
-        load(mTitle!!)
+        load(mTitle)
     }
 
 
@@ -88,19 +89,13 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
      * 显示候选数
      */
     private fun showFlag() {
-        val title: Array<ByteArray> = Array(9) { ByteArray(9) }
-        for (i in 0..8) {
-            for (j in 0..8) {
-                val cell = mList[i * 9 + j]
-                title[i][j] = cell.num.toByte()
-            }
-        }
+        val title = getInputMap()
         title.forEachIndexed { i, bytes ->
             bytes.forEachIndexed { j, byte ->
                 if (byte.toInt() == 0) {
                     val cell = mList[i * 9 + j]
                     cell.mode = SudokuCell.MODE_FLAG
-                    cell.flag = SudokuChecker.findCellCanInputNum(mTitle, i, j) as ArrayList<Int>
+                    cell.flag = SudokuChecker.findCellCanInputNum(title, i, j) as ArrayList<Int>
                     notifyItemChanged(i * 9 + j)
                 }
             }
@@ -127,8 +122,44 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
         if (mList.size == 0) initList()
         mList[mSelectPosition].num = num
         mList[mSelectPosition].mode = SudokuCell.MODE_INPUT
+        clearError()
+        val repeatCell = SudokuChecker.getRepeatCell(getInputMap(), mSelectPosition / 9, mSelectPosition % 9)
+        if (repeatCell.size > 0) {
+            mList[mSelectPosition].mode = mList[mSelectPosition].mode or SudokuCell.MODE_ERROR
+            repeatCell.forEach {
+                val i = it.x * 9 + it.y
+                mList[i].mode = mList[i].mode or SudokuCell.MODE_ERROR
+                notifyItemChanged(i)
+            }
+        }
         notifyItemChanged(mSelectPosition)
         if (mShowFlag) showFlag()
+    }
+
+    /**
+     * 清空错误提示
+     */
+    private fun clearError() {
+        mList.forEachIndexed { index, cell ->
+            if (cell.mode and SudokuCell.MODE_ERROR == SudokuCell.MODE_ERROR) {
+                cell.mode = cell.mode xor SudokuCell.MODE_ERROR
+                notifyItemChanged(index)
+            }
+        }
+    }
+
+    /**
+     * mList转二维数组
+     */
+    fun getInputMap(): Array<ByteArray> {
+        val title: Array<ByteArray> = Array(9) { ByteArray(9) }
+        for (i in 0..8) {
+            for (j in 0..8) {
+                val cell = mList[i * 9 + j]
+                title[i][j] = cell.num.toByte()
+            }
+        }
+        return title
     }
 
     /**
@@ -143,9 +174,9 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
     }
 
     /**
-     * 自动解题,输入变题目
+     * 输入变题目
      */
-    fun autoSolve() {
+    fun tobeTitle() {
         val title: Array<ByteArray> = Array(9) { ByteArray(9) }
         for (i in 0..8) {
             for (j in 0..8) {
@@ -187,6 +218,7 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
             bean.mode = SudokuCell.MODE_INPUT
             bean.num = 0
         }
+        mTitle = null
         mSelectPosition = -1
         notifyDataSetChanged()
     }

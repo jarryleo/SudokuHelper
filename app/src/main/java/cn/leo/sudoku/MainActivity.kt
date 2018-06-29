@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import cn.leo.sudoku.adapter.SudokuGridAdapter
+import cn.leo.sudoku.core.SudokuChecker
 import cn.leo.sudoku.core.SudokuEval
 import cn.leo.sudoku.core.SudokuFactory
 import cn.leo.sudoku.view.GridLine
@@ -33,6 +34,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
+            R.id.item_input -> {
+                sudokuGridAdapter.tobeTitle()
+            }
             R.id.item_reload -> {
                 sudokuGridAdapter.reload()
             }
@@ -102,9 +106,18 @@ class MainActivity : AppCompatActivity() {
 
     //电脑解题
     private fun computerSolve() {
-        sudokuGridAdapter.autoSolve()
+
         dialog?.show()
-        val title = sudokuGridAdapter.getTitle()
+        val title = sudokuGridAdapter.getInputMap()
+        val check = SudokuChecker.check(title)
+        if (!check) {
+            Toast.makeText(this,
+                    "题目有误，请检查！",
+                    Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (sudokuGridAdapter.getTitle() == null)
+            sudokuGridAdapter.tobeTitle()
         Thread {
             val sudokuEval = SudokuEval()
             val map = sudokuEval.input(title).solution().map
@@ -113,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                 dialog?.dismiss()
                 Toast.makeText(this,
                         "解题完毕！用时${sudokuEval.solutionTime}毫秒",
-                        Toast.LENGTH_SHORT).show()
+                        Toast.LENGTH_LONG).show()
             }
         }.start()
     }
