@@ -8,6 +8,10 @@
         android:title="显示候选词"
         app:actionLayout="@layout/switch_item"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/item_ocr"
+        android:title="摄像头扫描题目"/>
     <item
         android:id="@+id/item_titile"
         android:title="电脑出题">

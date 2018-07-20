@@ -1,5 +1,8 @@
 package cn.leo.sudoku
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
@@ -7,10 +10,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import cn.leo.permission.PermissionRequest
 import cn.leo.sudoku.adapter.SudokuGridAdapter
 import cn.leo.sudoku.core.SudokuChecker
 import cn.leo.sudoku.core.SudokuEval
 import cn.leo.sudoku.core.SudokuFactory
+import cn.leo.sudoku.ocr.OcrActivity
 import cn.leo.sudoku.view.GridLine
 import cn.leo.sudoku.view.SolvingDialog
 import kotlinx.android.synthetic.main.activity_main.*
@@ -34,6 +39,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
+            R.id.item_ocr -> {
+                openOCR()
+            }
             R.id.item_input -> {
                 sudokuGridAdapter.tobeTitle()
             }
@@ -63,6 +71,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    @PermissionRequest(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA)
+    private fun openOCR() {
+        val intent = Intent(this, OcrActivity::class.java)
+        startActivityForResult(intent, 100)
     }
 
     private fun initView() {
@@ -130,5 +146,13 @@ class MainActivity : AppCompatActivity() {
                         Toast.LENGTH_LONG).show()
             }
         }.start()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            val title = data?.getStringExtra("title")
+            sudokuGridAdapter.setTitle(SudokuEval().input(title).map)
+        }
     }
 }
