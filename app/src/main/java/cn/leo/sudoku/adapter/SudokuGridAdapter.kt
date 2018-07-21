@@ -137,6 +137,10 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
         if (mList.size == 0) initList()
         mList[mSelectPosition].num = num
         mList[mSelectPosition].mode = SudokuCell.MODE_INPUT
+        checkError()
+    }
+
+    private fun checkError() {
         clearError()
         val repeatCell = SudokuChecker.getRepeatCell(getInputMap(), mSelectPosition / 9, mSelectPosition % 9)
         if (repeatCell.size > 0) {

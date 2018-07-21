@@ -2,7 +2,6 @@ package cn.leo.sudoku.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -52,6 +51,7 @@ public class OcrScanner {
         mTess = new TessBaseAPI();
         String language = "eng";
         mTess.setDebug(BuildConfig.DEBUG);
+        mTess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_CHAR);
         mInit = mTess.init(dataPath, language);
     }
 
@@ -111,27 +111,4 @@ public class OcrScanner {
         void onOcrResult(int num, String result, boolean success);
     }
 
-    public static class BoxNum {
-        private String mWord;
-        private Rect mRect = new Rect();
-
-        BoxNum(String box, int bitmapHeight) {
-            String[] s = box.split(" ");
-            if (s.length < 5) return;
-            mWord = s[0];
-            int left = Integer.parseInt(s[1]);
-            int top = bitmapHeight - Integer.parseInt(s[4]);
-            int right = Integer.parseInt(s[3]);
-            int bottom = bitmapHeight - Integer.parseInt(s[2]);
-            mRect.set(left, top, right, bottom);
-        }
-
-        public String getWord() {
-            return mWord;
-        }
-
-        public Rect getRect() {
-            return mRect;
-        }
-    }
 }
