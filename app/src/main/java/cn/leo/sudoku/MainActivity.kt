@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             val title = data?.getStringExtra("title")
-            sudokuGridAdapter.setTitle(SudokuEval().input(title).map)
+            sudokuGridAdapter.setNums(SudokuEval().input(title).map)
         }
     }
 }

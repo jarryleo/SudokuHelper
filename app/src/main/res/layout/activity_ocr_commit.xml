@@ -8,12 +8,12 @@
     android:layout_height="match_parent"
     tools:context=".ocr.OcrActivity">
 
-    <cn.leo.sudoku.ocr.CameraView
+    <View
         android:id="@+id/cameraPre"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <cn.leo.sudoku.ocr.ScannerView
+    <View
         android:id="@+id/scanner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

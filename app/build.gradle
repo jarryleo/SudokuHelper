@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'cn.leo.plugin.magic'
-
+//apply plugin: 'cn.leo.plugin.magic'
+apply plugin: 'android-aspectjx'
 android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "cn.leo.sudoku"
-        minSdkVersion 21
+        minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"

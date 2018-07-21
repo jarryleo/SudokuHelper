@@ -1,6 +1,7 @@
 package cn.leo.sudoku.ocr;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.LifecycleOwner;
@@ -48,6 +49,7 @@ import java.util.List;
  * create by : Jarry Leo
  * date : 2018/7/20 9:15
  */
+@TargetApi(21)
 public class CameraView2 extends TextureView implements LifecycleObserver, TextureView.SurfaceTextureListener, View.OnClickListener {
     private String TAG = "CameraView";
     private OnBitmapCreateListener mBitmapCreateListener;

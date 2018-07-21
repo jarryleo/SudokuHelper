@@ -58,12 +58,7 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
         mShowSet = new ConstraintSet();
         mNormalSet.clone(mConstraintLayout);
         mShowSet.clone(this, R.layout.activity_ocr_commit);
-        new Thread() {
-            @Override
-            public void run() {
-                copyFile();
-            }
-        }.start();
+        copyFile();
     }
 
     private void copyFile() {

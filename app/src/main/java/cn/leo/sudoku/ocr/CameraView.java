@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class CameraView extends TextureView implements LifecycleObserver, TextureView.SurfaceTextureListener, View.OnClickListener {
     private String TAG = "CameraView";
-    private Camera mCamera;
+    private static Camera mCamera;
     private Camera.Parameters mParameters;
     private OnBitmapCreateListener mBitmapCreateListener;
     private Rect mBitmapRect = new Rect();
@@ -55,7 +55,9 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
             return;
         }
         if (context instanceof LifecycleOwner) {
-            ((LifecycleOwner) context).getLifecycle().addObserver(this);
+            Lifecycle lifecycle = ((LifecycleOwner) context).getLifecycle();
+            lifecycle.removeObserver(this);
+            lifecycle.addObserver(this);
             setSurfaceTextureListener(this);
             setOnClickListener(this);
         }
@@ -74,6 +76,7 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResume() {
         requestCamera(Camera.CameraInfo.CAMERA_FACING_BACK);
+        //requestCamera(Camera.CameraInfo.CAMERA_FACING_FRONT);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -90,8 +93,8 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         initPreViewSize(width, height);
-        setPreviewTexture(surface);
         setDisplayOrientation(90);
+        setPreviewTexture(surface);
         startPreview();
         Log.i(TAG, "onSurfaceTextureAvailable: size:" + width + "," + height);
     }
@@ -134,7 +137,7 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
      *
      * @param cameraId 摄像头id
      */
-    private void openCamera(int cameraId) {
+    private synchronized void openCamera(int cameraId) {
         try {
             if (mCamera == null) {
                 mCamera = Camera.open(cameraId);

@@ -62,6 +62,21 @@ class SudokuGridAdapter : RecyclerView.Adapter<SudokuCellHolder>() {
     }
 
     /**
+     * 设置数字
+     */
+    fun setNums(title: Array<ByteArray>) {
+        title.forEachIndexed { i, bytes ->
+            bytes.forEachIndexed { j, byte ->
+                val bean = mList[i * 9 + j]
+                bean.num = byte.toInt()
+                bean.mode = SudokuCell.MODE_INPUT
+            }
+        }
+        notifyDataSetChanged()
+        if (mShowFlag) showFlag()
+    }
+
+    /**
      * 装载题目
      */
     private fun load(title: Array<ByteArray>?) {
