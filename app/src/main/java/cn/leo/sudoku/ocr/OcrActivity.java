@@ -96,6 +96,7 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
         int height = bitmap.getHeight() / 9;
         int dw = width / 8;
         int dh = height / 8;
+        int num = 0;
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 final Bitmap cell = Bitmap.createBitmap(bitmap,
@@ -106,23 +107,26 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
                 String s = ocrWordScan(cell);
                 if (!TextUtils.isEmpty(s) && TextUtils.isDigitsOnly(s)) {
                     sb.append(s);
+                    num++;
                 } else {
                     sb.append("0");
                 }
             }
         }
         mResult = sb.toString();
+        final int finalNum = num;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mTxtView.setText(String.format("识别结果:%s", mResult));
                 boolean check = SudokuChecker.check(mResult);
-                if (check) {
+                if (check && finalNum > 10) {
                     Toast.makeText(OcrActivity.this, "识别成功，请检查识别是否正确", Toast.LENGTH_SHORT).show();
                     showCommit();
+                    mScannerView.setResult(mResult);
                 } else {
-                    Toast.makeText(OcrActivity.this, "识别错误，请重试", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OcrActivity.this, "识别失败，请重试", Toast.LENGTH_SHORT).show();
                 }
+                mBtnTakePic.setEnabled(true);
             }
         });
     }
@@ -144,6 +148,8 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (v == mBtnTakePic) {
+            mBtnTakePic.setEnabled(false);
+            mScannerView.setResult(null);
             hideCommit();
             mCameraView.takePicture();
         } else if (v == mBtnCommit) {
@@ -155,6 +161,7 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void showCommit() {
+        mBtnTakePic.setText("重新扫描");
         TransitionManager.beginDelayedTransition(mConstraintLayout);
         mShowSet.applyTo(mConstraintLayout);
     }
