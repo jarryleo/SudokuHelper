@@ -59,7 +59,7 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
             public void onOcrResult(int num, String result, boolean success) {
                 mResult = result;
                 if (success && num > 10) {
-                    Toast.makeText(OcrActivity.this, "识别成功，请检查识别是否正确", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OcrActivity.this, "识别成功，请检查识别结果是否正确", Toast.LENGTH_SHORT).show();
                     showCommit();
                     mScannerView.setResult(result);
                 } else {
