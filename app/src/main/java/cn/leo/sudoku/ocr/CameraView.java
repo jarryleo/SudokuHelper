@@ -13,6 +13,11 @@ import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Process;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
+import android.renderscript.Type;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.TextureView;
@@ -35,6 +40,14 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
     private Camera.Parameters mParameters;
     private OnBitmapCreateListener mBitmapCreateListener;
     private Rect mBitmapRect = new Rect();
+    //获取预览图像变量
+    private long mLastTakePicTime;
+    private RenderScript mRs;
+    private ScriptIntrinsicYuvToRGB mYuvToRgbIntrinsic;
+    private Type.Builder mYuvType;
+    private Type.Builder mRgbaType;
+    private Allocation mIn;
+    private Allocation mOut;
 
     public CameraView(Context context) {
         this(context, null);
@@ -60,6 +73,8 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
             lifecycle.addObserver(this);
             setSurfaceTextureListener(this);
             setOnClickListener(this);
+            mRs = RenderScript.create(getContext());
+            mYuvToRgbIntrinsic = ScriptIntrinsicYuvToRGB.create(mRs, Element.U8_4(mRs));
         }
     }
 
@@ -175,7 +190,8 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
 
     public void takePicture() {
         if (mCamera != null) {
-            mCamera.takePicture(null, null, mPictureCallback);
+            //mCamera.takePicture(null, null, mPictureCallback);
+            mCamera.setPreviewCallback(mPreviewCallback);
         }
     }
 
@@ -200,8 +216,12 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
     private Camera.PreviewCallback mPreviewCallback = new Camera.PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
+            mCamera.setPreviewCallback(null);
+            if (System.currentTimeMillis() - mLastTakePicTime < 1000) return;
+            mLastTakePicTime = System.currentTimeMillis();
             Camera.Size size = camera.getParameters().getPreviewSize();
-            createBitmap(size.width, size.height, data);
+            //createBitmap(size.width, size.height, data);
+            createPreBitmap(data.length, size.width, size.height, data);
         }
     };
 
@@ -285,6 +305,28 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
         }
     }
 
+    private void createPreBitmap(int dataLength, int prevSizeW, int prevSizeH, byte[] data) {
+        if (mYuvType == null) {
+            mYuvType = new Type.Builder(mRs, Element.U8(mRs)).setX(dataLength);
+            mIn = Allocation.createTyped(mRs, mYuvType.create(), Allocation.USAGE_SCRIPT);
+            mRgbaType = new Type.Builder(mRs, Element.RGBA_8888(mRs)).setX(prevSizeW).setY(prevSizeH);
+            mOut = Allocation.createTyped(mRs, mRgbaType.create(), Allocation.USAGE_SCRIPT);
+        }
+        mIn.copyFrom(data);
+        mYuvToRgbIntrinsic.setInput(mIn);
+        mYuvToRgbIntrinsic.forEach(mOut);
+        Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        Bitmap bmpOut = Bitmap.createBitmap(prevSizeW, prevSizeH, Bitmap.Config.ARGB_8888);
+        mOut.copyTo(bmpOut);
+        int rw = prevSizeH * 2 / 3;
+        mBitmapRect.set(prevSizeW / 2 - rw / 2, rw / 4, prevSizeW / 2 + rw / 2, rw + rw / 4);
+        Bitmap bitmap = Bitmap.createBitmap(bmpOut, mBitmapRect.left, mBitmapRect.top, mBitmapRect.width(), mBitmapRect.height(), matrix, true);
+        bmpOut.recycle();
+        if (mBitmapCreateListener != null) {
+            mBitmapCreateListener.onBitmapCreate(bitmap);
+        }
+    }
 
     public void setOnBitmapCreateListener(OnBitmapCreateListener onBitmapCreateListener) {
         mBitmapCreateListener = onBitmapCreateListener;

@@ -9,6 +9,7 @@ import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -68,11 +69,11 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
         initTessBaseData(dataPath);
     }
 
-    private void initTessBaseData(String datapath) {
+    private void initTessBaseData(String dataPath) {
         mTess = new TessBaseAPI();
         String language = "eng";
         mTess.setDebug(BuildConfig.DEBUG);
-        mInit = mTess.init(datapath, language);
+        mInit = mTess.init(dataPath, language);
         if (!mInit) {
             Toast.makeText(this, "加载语言包失败", Toast.LENGTH_SHORT).show();
             return;
@@ -84,8 +85,35 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
                     @Override
                     public void run() {
                         splitBitmap(bitmap);
+                        //ocrScan(bitmap);
                     }
                 }.start();
+            }
+        });
+        initTess2(dataPath);
+    }
+
+    TessBaseAPI mTess2;
+
+    private void initTess2(String dataPath) {
+        mTess2 = new TessBaseAPI();
+        String language = "eng";
+        mTess2.setDebug(BuildConfig.DEBUG);
+        mTess2.init(dataPath, language);
+    }
+
+    private void ocrScan(Bitmap bitmap) {
+        mTess2.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, "123456789"); // 识别白名单
+        mTess2.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, "!@#$%^&*()_+=-[]}{;:'\"\\|~`,./<>?"); // 识别黑名单
+        mTess2.setImage(bitmap);
+        String boxText = mTess2.getBoxText(0);
+        Log.i("boxText", "ocrScan: " + boxText);
+        final String utf8Text = mTess2.getUTF8Text().replace("\n", "");
+        final String result = Ocr2String.create(boxText, bitmap.getWidth(), bitmap.getHeight()).getResult();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mTxtView.setText("数独题:" + result + "\n识别的数：" + utf8Text);
             }
         });
     }
@@ -124,7 +152,12 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
                     showCommit();
                     mScannerView.setResult(mResult);
                 } else {
-                    Toast.makeText(OcrActivity.this, "识别失败，请重试", Toast.LENGTH_SHORT).show();
+                    if (finalNum > 10) {
+                        mScannerView.setResult(mResult);
+                        Toast.makeText(OcrActivity.this, "题目不合法，请重试", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(OcrActivity.this, "识别失败，请重试", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 mBtnTakePic.setEnabled(true);
             }
