@@ -34,6 +34,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <Button
+        android:layout_marginBottom="8dp"
         android:id="@+id/btnTakePic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -45,6 +46,7 @@
         app:layout_constraintRight_toLeftOf="@id/btnCommit"/>
 
     <Button
+        android:layout_marginBottom="8dp"
         android:id="@+id/btnCommit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

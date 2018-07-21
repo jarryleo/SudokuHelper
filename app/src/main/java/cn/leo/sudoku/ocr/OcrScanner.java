@@ -2,6 +2,7 @@ package cn.leo.sudoku.ocr;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -55,12 +56,14 @@ public class OcrScanner {
     }
 
     public void scan(Bitmap bitmap) {
+        if (mOnOcrResultListener == null) return;
         final StringBuilder sb = new StringBuilder();
         int width = bitmap.getWidth() / 9;
         int height = bitmap.getHeight() / 9;
         int dw = width / 8;
         int dh = height / 8;
         int num = 0;
+        //第一次扫描，获取误差
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 final Bitmap cell = Bitmap.createBitmap(bitmap,
@@ -77,14 +80,17 @@ public class OcrScanner {
                 }
             }
         }
-        final String result = sb.toString();
+        //第二次扫描修正误差 TODO
+
+        callback(sb.toString(), num);
+    }
+
+    private void callback(final String result, final int num) {
         final boolean check = SudokuChecker.check(result);
-        if (mOnOcrResultListener == null) return;
-        final int finalNum = num;
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mOnOcrResultListener.onOcrResult(finalNum, result, check);
+                mOnOcrResultListener.onOcrResult(num, result, check);
             }
         });
     }
@@ -103,5 +109,29 @@ public class OcrScanner {
 
     public interface OnOcrResultListener {
         void onOcrResult(int num, String result, boolean success);
+    }
+
+    public static class BoxNum {
+        private String mWord;
+        private Rect mRect = new Rect();
+
+        BoxNum(String box, int bitmapHeight) {
+            String[] s = box.split(" ");
+            if (s.length < 5) return;
+            mWord = s[0];
+            int left = Integer.parseInt(s[1]);
+            int top = bitmapHeight - Integer.parseInt(s[4]);
+            int right = Integer.parseInt(s[3]);
+            int bottom = bitmapHeight - Integer.parseInt(s[2]);
+            mRect.set(left, top, right, bottom);
+        }
+
+        public String getWord() {
+            return mWord;
+        }
+
+        public Rect getRect() {
+            return mRect;
+        }
     }
 }
