@@ -108,11 +108,11 @@ public class CameraView2 extends TextureView implements LifecycleObserver, Textu
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResume() {
         startCameraThread();
-        /*if (isAvailable()) {
+        if (isAvailable()) {
             setSurfaceTextureListener(this);
         } else {
             startPreview();
-        }*/
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)

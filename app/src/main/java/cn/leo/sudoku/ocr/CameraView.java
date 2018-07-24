@@ -69,7 +69,6 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
         }
         if (context instanceof LifecycleOwner) {
             Lifecycle lifecycle = ((LifecycleOwner) context).getLifecycle();
-            lifecycle.removeObserver(this);
             lifecycle.addObserver(this);
             setSurfaceTextureListener(this);
             setOnClickListener(this);
@@ -97,12 +96,12 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void onPause() {
         stopPreview();
-        closeCamera();
+
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void onDestroy() {
-
+        closeCamera();
     }
 
     @Override
@@ -157,6 +156,8 @@ public class CameraView extends TextureView implements LifecycleObserver, Textur
             if (mCamera == null) {
                 mCamera = Camera.open(cameraId);
                 Log.i(TAG, "Camera has opened, cameraId is " + cameraId);
+            } else {
+                startPreview();
             }
         } catch (Exception e) {
             Log.e(TAG, "Open Camera has exception!");

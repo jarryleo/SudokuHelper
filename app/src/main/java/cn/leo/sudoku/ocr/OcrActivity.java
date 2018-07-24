@@ -1,5 +1,6 @@
 package cn.leo.sudoku.ocr;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import cn.leo.permission.PermissionRequest;
 import cn.leo.sudoku.R;
 
 public class OcrActivity extends AppCompatActivity implements View.OnClickListener {
@@ -52,6 +54,9 @@ public class OcrActivity extends AppCompatActivity implements View.OnClickListen
         init();
     }
 
+    @PermissionRequest({Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA})
     private void init() {
         mOcrScanner = OcrScanner.build(this);
         mOcrScanner.setOnOcrResultListener(new OcrScanner.OnOcrResultListener() {
